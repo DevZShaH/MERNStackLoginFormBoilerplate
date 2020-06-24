@@ -1,24 +1,25 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const path = require("path");
-const cors = require('cors')
+const path = require('path');
+const cors = require('cors');
 
-const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
+// const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 
-const config = require("./config/keys");
+const config = require('./config/keys');
 
+const mongoose = require('mongoose');
+const connect = mongoose
+	.connect(config.mongoURI, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+		useCreateIndex: true,
+		useFindAndModify: false
+	})
+	.then(() => console.log('MongoDB Connected...'))
+	.catch((err) => console.log(err));
 
-const mongoose = require("mongoose");
-const connect = mongoose.connect(config.mongoURI,
-    {
-        useNewUrlParser: true, useUnifiedTopology: true,
-        useCreateIndex: true, useFindAndModify: false
-    })
-    .then(() => console.log('MongoDB Connected...'))
-    .catch(err => console.log(err));
-
-app.use(cors())
+app.use(cors());
 
 //to not get any deprecation warning or error
 //support parsing of application/x-www-form-urlencoded post data
@@ -30,36 +31,27 @@ app.use(cookieParser());
 
 app.use('/api/users', require('./routes/users'));
 
-
 //use this to show the image you have in node js server to client (react js)
 //https://stackoverflow.com/questions/48914987/send-image-path-from-node-js-express-server-to-react-client
 app.use('/uploads', express.static('uploads'));
 
 // Serve static assets if in production
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === 'production') {
+	// Set static folder
+	// All the javascript and css files will be read and served from this folder
+	app.use(express.static('client/build'));
 
-    // Set static folder   
-    // All the javascript and css files will be read and served from this folder
-    app.use(express.static("client/build"));
-
-    // index.html for all page routes    html or routing and naviagtion
-    app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "../client", "build", "index.html"));
-    });
+	// index.html for all page routes    html or routing and naviagtion
+	app.get('*', (req, res) => {
+		res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
+	});
 }
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
-    console.log(`Server Listening on ${port}`)
+	console.log(`Server Listening on ${port}`);
 });
-
-
-
-
-
-
-
 
 // =======================================================================================================================================================================
 // =======================================================================================================================================================================
@@ -116,9 +108,8 @@ app.listen(port, () => {
 
 // });
 
-
 // app.post('/api/users/login', (req, res)=>{
-    
+
 //     //find the email
 //     User.findOne({email: req.body.email}, (err, user)=>{
 //         if(!user) return res.json({
@@ -133,7 +124,6 @@ app.listen(port, () => {
 //         }
 //     })
 
-
 //     //generateToken
 //     user.generateToken((err, user)=>{
 //         if(err) return res.status(400).send(err);
@@ -146,7 +136,6 @@ app.listen(port, () => {
 //     })
 
 // });
-
 
 // app.get('/api/users/logout', auth, (req,res)=>{
 
