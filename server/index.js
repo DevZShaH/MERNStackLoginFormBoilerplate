@@ -1,154 +1,54 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const path = require('path');
-const cors = require('cors');
-
 // const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 
-const config = require('./config/keys');
+const config = require("./config/key");
 
-const mongoose = require('mongoose');
-const connect = mongoose
-	.connect(config.mongoURI, {
-		useNewUrlParser: true,
+// const mongoose = require("mongoose");
+// mongoose
+//   .connect(config.mongoURI, { useNewUrlParser: true })
+//   .then(() => console.log("DB connected"))
+//   .catch(err => console.error(err));
+
+const mongoose = require("mongoose");
+const connect = mongoose.connect(config.mongoURI, { useNewUrlParser: true,
 		useUnifiedTopology: true,
 		useCreateIndex: true,
-		useFindAndModify: false
-	})
-	.then(() => console.log('MongoDB Connected...'))
-	.catch((err) => console.log(err));
+		useFindAndModify: false })
+  .then(() => console.log('MongoDB Connected...'))
+  .catch(err => console.log(err));
 
-app.use(cors());
 
-//to not get any deprecation warning or error
-//support parsing of application/x-www-form-urlencoded post data
 app.use(express.urlencoded({ extended: true }));
-//to get json data
-// support parsing of application/json type post data
 app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/users', require('./routes/users'));
+app.use('/api/video', require('./routes/video'));
+app.use('/api/subscribe', require('./routes/subscribe'));
+app.use('/api/comment', require('./routes/comment'));
+app.use('/api/like', require('./routes/like'));
+
 
 //use this to show the image you have in node js server to client (react js)
 //https://stackoverflow.com/questions/48914987/send-image-path-from-node-js-express-server-to-react-client
 app.use('/uploads', express.static('uploads'));
 
 // Serve static assets if in production
-if (process.env.NODE_ENV === 'production') {
-	// Set static folder
-	// All the javascript and css files will be read and served from this folder
-	app.use(express.static('client/build'));
+if (process.env.NODE_ENV === "production") {
 
-	// index.html for all page routes    html or routing and naviagtion
-	app.get('*', (req, res) => {
-		res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
-	});
+  // Set static folder
+  app.use(express.static("client/build"));
+
+  // index.html for all page routes
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
 }
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5000
 
 app.listen(port, () => {
-	console.log(`Server Listening on ${port}`);
+  console.log(`Server Running at ${port}`)
 });
-
-// =======================================================================================================================================================================
-// =======================================================================================================================================================================
-// =======================================================================================================================================================================
-// const express = require('express');
-// const app = express();
-
-// const mongoose = require('mongoose');
-// const cookieParser = require('cookie-parser');
-
-// //keys
-// const config = require('./config/keys')
-
-// const {User} = require('./models/user'); //Required to post data into mongodb database
-// const {auth} = require('./middleware/auth');
-
-// // CONNECT DB
-// mongoose.connect(config.mongoURI,
-// {useNewUrlParser:true,useUnifiedTopology: true}).then(()=>console.log('Database Connected')).catch(err=> console.log(err));
-// mongoose.set('useCreateIndex', true);
-
-// // MIDDLEWARES
-// //Body-parser and Cookie-parser
-// app.use(express.urlencoded({extended:true}));
-// app.use(express.json());
-// app.use(cookieParser());
-
-// // ROUTES
-
-// app.get('/', (req,res)=>{
-//     res.json({"hello":"world"})
-// })
-
-// app.get('/api/users/auth', auth, (req,res)=>{
-//     res.status(200).json({
-//         _id: req.user._id,
-//         isAuth: true,
-//         email: req.user.email,
-//         name: req.user.name,
-//         lastname: req.user.lastname,
-//         role: req.user.role
-//     })
-// })
-
-// app.post('/api/users/register', (req,res)=>{
-
-//     const user = new User(req.body);
-// //=========Before saving into database we do password hashing in this area. check userSchema.pre() in user.js in models====================
-//     user.save((err, userData)=>{
-//         if(err) return res.json({success:false, err});
-
-//         return res.status(200).json({success:true, userData});
-//     });
-
-// });
-
-// app.post('/api/users/login', (req, res)=>{
-
-//     //find the email
-//     User.findOne({email: req.body.email}, (err, user)=>{
-//         if(!user) return res.json({
-//             loginSuccess: false,
-//             message: "Authentication Failed, Email not found!"
-//         });
-
-//     //comparePassword
-//     user.comparePassword(req.body.password, (err, isMatch)=>{
-//         if(!isMatch){
-//             return res.json({loginSuccess: false, message: "Wrong Password"});
-//         }
-//     })
-
-//     //generateToken
-//     user.generateToken((err, user)=>{
-//         if(err) return res.status(400).send(err);
-//         res.cookie("x_auth", user.token)
-//         .status(200)
-//         .json({loginSuccess: true});
-
-//     });
-
-//     })
-
-// });
-
-// app.get('/api/users/logout', auth, (req,res)=>{
-
-//     User.findOneAndUpdate({_id: req.user._id}, {token:''}, (err, doc)=>{
-//         if(err) return res.json({success: false, err})
-//         return res.status(200).send({
-//             success: true
-//         })
-//     })
-// })
-
-// const port = process.env.PORT || 5000;
-
-// app.listen(port, ()=>{
-//     console.log(`Server running at port: ${port}`)
-// });
