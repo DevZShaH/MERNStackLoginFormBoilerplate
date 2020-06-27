@@ -40,7 +40,7 @@ app.use('/uploads', express.static('uploads'));
 // Serve static assets if in production
 if (process.env.NODE_ENV === 'production') {
 	// Set static folder
-	app.use(express.static('../client/build'));
+	app.use(express.static('client/build'));
 
 	// index.html for all page routes
 	app.get('*', (req, res) => {
